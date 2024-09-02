@@ -128,7 +128,7 @@ SELECT reu_no, code_no, 'RM', Reu_name, cle_no, NULL
 FROM #temp_table3
 WHERE fac_type = 'C'
 
-DROP TABLE #temp_table3
+DROP TABLE #temp_table2, #temp_table3
 
 SELECT *
 FROM node n 
