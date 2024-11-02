@@ -240,56 +240,40 @@ ORDER BY YMDate --申報年月
 --
 --列管事業(A1) -> 清除單位(C)
 --
-SELECT wdw.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty INTO #temp_table
-FROM IMP_3.dbo.Waste_Dlist_wre1 wdw 
-LEFT JOIN IMP_3.dbo.Waste_Dlist_wre2 wdw2 
-	ON wdw.Dlist_no1 = wdw2.Dlist_no1 
-WHERE wdw.Dlist_no2 = wdw2.Dlist_no2 
-	AND wdw.Dlist_no3 = wdw2.Dlist_no3 
-	AND wdw.Dlist_no1 = 'R9000269'
-	AND Cle_no = 'C1111111'
-	AND Reu_no = 'K8200222'
-	AND Waste_no = 'R-0201'
-UNION
-SELECT wdw3.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
-FROM IMP_3.dbo.Waste_Dlist_wt1 wdw3 
-LEFT JOIN IMP_3.dbo.Waste_Dlist_wt2 wdw4  
-	ON wdw3.Dlist_no1 = wdw4.Dlist_no1 
-WHERE wdw3.Dlist_no2 = wdw4.Dlist_no2 
-	AND wdw3.Dlist_no3 = wdw4.Dlist_no3 
-	AND wdw3.Dlist_no1 = 'R9000269'
-	AND Cle_no = 'C1111111'
-	AND Reu_no = 'K8200222'
-	AND Waste_no = 'R-0201'
-	
-SELECT *
-FROM #temp_table
-ORDER BY Wcle_date --清運日期
-
 SELECT SUM(App_Qty), MONTH(Wcle_date), YEAR(Wcle_date)
-FROM #temp_table
-GROUP BY MONTH(Wcle_date), YEAR(Wcle_date)
-
-DROP TABLE #temp_table
+FROM (
+	SELECT wdw.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
+	FROM IMP_3.dbo.Waste_Dlist_wre1 wdw 
+	LEFT JOIN IMP_3.dbo.Waste_Dlist_wre2 wdw2 
+		ON wdw.Dlist_no1 = wdw2.Dlist_no1 
+	WHERE wdw.Dlist_no2 = wdw2.Dlist_no2 
+		AND wdw.Dlist_no3 = wdw2.Dlist_no3 
+		AND wdw.Dlist_no1 = 'O17L2584'
+		AND Cle_no = 'B25A9221'
+		AND Waste_no = 'R-0201'
+	UNION
+	SELECT wdw3.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
+	FROM IMP_3.dbo.Waste_Dlist_wt1 wdw3 
+	LEFT JOIN IMP_3.dbo.Waste_Dlist_wt2 wdw4 
+		ON wdw3.Dlist_no1 = wdw4.Dlist_no1 
+	WHERE wdw3.Dlist_no2 = wdw4.Dlist_no2 
+		AND wdw3.Dlist_no3 = wdw4.Dlist_no3 
+		AND wdw3.Dlist_no1 = 'O17L2584'
+		AND Cle_no = 'B25A9221'
+		AND Waste_no = 'R-0201') AS SubQuery
+GROUP BY MONTH(Wcle_date), YEAR(Wcle_date) --清運日期
 
 --
 --非列管事業(A2) -> 清除單位(C)
 --
-SELECT Reu_No, FacID, Cle_No, Waste_No, ReuQty, Rec_Date, Reu_Date INTO #temp_table
-FROM IMP_1.dbo.Waste_ReuMonReportN_Commit wrmrnc 
-WHERE FacID = '07568009'
-	AND Cle_No = 'C1111111'
-	AND Waste_No = 'R-0201'
-
-SELECT *
-FROM #temp_table
-ORDER BY Rec_Date --接受處理(再利用)日期
-
 SELECT SUM(ReuQty), MONTH(Rec_Date), YEAR(Rec_Date)
-FROM #temp_table
-GROUP BY MONTH(Rec_Date), YEAR(Rec_Date)
-
-DROP TABLE #temp_table
+FROM (
+	SELECT Reu_No, FacID, Cle_No, Waste_No, ReuQty, Rec_Date, Reu_Date
+	FROM IMP_1.dbo.Waste_ReuMonReportN_Commit wrmrnc 
+	WHERE FacID = '23161533'
+		AND Cle_No = 'A36B2911'
+		AND Waste_No = 'R-0201') AS SubQuery
+GROUP BY MONTH(Rec_Date), YEAR(Rec_Date) --接受處理(再利用)日期
 
 SELECT *
 FROM IMP.dbo.Industry i 
@@ -302,45 +286,38 @@ WHERE ControlNo = 'H46B5841'
 --
 --清除單位(C) -> 再利用單位-原料(RM)
 --
-SELECT wdw.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty INTO #temp_table
-FROM IMP_3.dbo.Waste_Dlist_wre1 wdw 
-LEFT JOIN IMP_3.dbo.Waste_Dlist_wre2 wdw2 
-	ON wdw.Dlist_no1 = wdw2.Dlist_no1
-WHERE wdw.Dlist_no2 = wdw2.Dlist_no2
-	AND wdw.Dlist_no3 = wdw2.Dlist_no3
-	AND Cle_no = 'C0000000'
-	AND Reu_no = 'H5200215'
-	AND Waste_no = 'R-0201'
-	AND wdw.Dlist_no1 = '07568009'
-UNION
-SELECT wdw3.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
-FROM IMP_3.dbo.Waste_Dlist_wt1 wdw3
-LEFT JOIN IMP_3.dbo.Waste_Dlist_wt2 wdw4 
-	ON wdw3.Dlist_no1 = wdw4.Dlist_no1 
-WHERE wdw3.Dlist_no2 = wdw4.Dlist_no2 
-	AND wdw3.Dlist_no3 = wdw4.Dlist_no3 
-	AND Cle_no = 'C0000000'
-	AND Reu_no = 'H5200215'
-	AND Waste_no = 'R-0201'
-	AND wdw3.Dlist_no1 = '07568009'
-UNION
-SELECT FacID AS Dlist_no1, Cle_No AS Cle_no, Reu_No AS Reu_no, Rec_Date AS Wcle_date, Waste_No AS Waste_no, ReuQty AS App_Qty
-FROM IMP_1.dbo.Waste_ReuMonReportN_Commit wrmrnc
-WHERE Cle_No = 'C0000000'
-	AND Reu_No = 'H5200215'
-	AND Waste_No = 'R-0201'
-	AND FacID = '07568009'
-	
-SELECT *
-FROM #temp_table
-ORDER BY Wcle_date
-
 SELECT SUM(App_Qty), MONTH(Wcle_date), YEAR(Wcle_date)
-FROM #temp_table
+FROM (
+	SELECT wdw.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
+	FROM IMP_3.dbo.Waste_Dlist_wre1 wdw 
+	LEFT JOIN IMP_3.dbo.Waste_Dlist_wre2 wdw2 
+		ON wdw.Dlist_no1 = wdw2.Dlist_no1
+	WHERE wdw.Dlist_no2 = wdw2.Dlist_no2
+		AND wdw.Dlist_no3 = wdw2.Dlist_no3
+		AND Cle_no = 'C0000000'
+		AND Reu_no = 'K8200222'
+		AND Waste_no = 'R-0201'
+		AND wdw.Dlist_no1 = '96405802'
+	UNION
+	SELECT wdw3.Dlist_no1, Cle_no, Reu_no, Wcle_date, Waste_no, App_Qty
+	FROM IMP_3.dbo.Waste_Dlist_wt1 wdw3
+	LEFT JOIN IMP_3.dbo.Waste_Dlist_wt2 wdw4 
+		ON wdw3.Dlist_no1 = wdw4.Dlist_no1 
+	WHERE wdw3.Dlist_no2 = wdw4.Dlist_no2 
+		AND wdw3.Dlist_no3 = wdw4.Dlist_no3 
+		AND Cle_no = 'C0000000'
+		AND Reu_no = 'K8200222'
+		AND Waste_no = 'R-0201'
+		AND wdw3.Dlist_no1 = '96405802'
+	UNION
+	SELECT FacID AS Dlist_no1, Cle_No AS Cle_no, Reu_No AS Reu_no, Rec_Date AS Wcle_date, Waste_No AS Waste_no, ReuQty AS App_Qty
+	FROM IMP_1.dbo.Waste_ReuMonReportN_Commit wrmrnc
+	WHERE Cle_No = 'C0000000'
+		AND Reu_No = 'K8200222'
+		AND Waste_No = 'R-0201'
+		AND FacID = '96405802') AS SubQuery
 GROUP BY MONTH(Wcle_date), YEAR(Wcle_date)
---ORDER BY YEAR(Wcle_date), MONTH(Wcle_date)
-
-DROP TABLE #temp_table
+ORDER BY YEAR(Wcle_date), MONTH(Wcle_date)
 
 USE tempdb
 GO
